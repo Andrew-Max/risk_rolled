@@ -1,9 +1,11 @@
+var aDice1, aDice2, aDice3, dDice1, dDice2;
+var attackDice, defenseDice;
+var attack_remaining, defense_remaining;
+
 $(document).ready(function () {
-  var aDice1, aDice2, aDice3, dDice1, dDice2;
-  var attackDice, defenseDice;
 
   function numberComparison(a, b) {
-    return a - b;
+    return b - a;
   };
 
   function sortDice() {
@@ -19,12 +21,32 @@ $(document).ready(function () {
     dDice2 = undefined;
   };
 
+  function compareDice() {
+    var d1result = attackDice[0] > defenseDice[0];
+    var d2result = attackDice[1] > defenseDice[1];
+
+    d1result ? defense_remaining-- : attack_remaining--;
+    d2result ? defense_remaining-- : attack_remaining--;
+  };
+
   function setDebugInfo() {
     $('.a1 .val').text(aDice1);
     $('.a2 .val').text(aDice2);
     $('.a3 .val').text(aDice3);
     $('.b1 .val').text(dDice1);
     $('.b2 .val').text(dDice2);
+    $('.attack-dice .val').text(attackDice);
+    $('.defense-dice .val').text(defenseDice);
+    $('.defense-remaining .val').text(defense_remaining);
+    $('.attack-remaining .val').text(attack_remaining);
+
+    if(attack_remaining <= 0) {
+      $('.result .val').text("Defense Keeps " + defense_remaining);
+    }
+
+    if(defense_remaining <= 0) {
+      $('.result .val').text("Attack Keeps " + attack_remaining);
+    }
   };
 
   function rollSingleDice() {
@@ -47,12 +69,12 @@ $(document).ready(function () {
     } else if (attack_remaining = 3) {
       aDice1 = rollSingleDice();
       aDice2 = rollSingleDice();
-      aDice3 = 0
+      aDice3 = undefined;
 
     } else {
       aDice1 = rollSingleDice();
-      aDice2 = rollSingleDice();
-      aDice3 = 0
+      aDice2 = undefined;
+      aDice3 = undefined;
     }
 
     if (defense_remaining > 1) {
@@ -60,26 +82,29 @@ $(document).ready(function () {
       dDice2 = rollSingleDice();
     } else {
       dDice1 = rollSingleDice();
-      dDice2 = 0;
+      dDice2 = undefined;
     }
   };
+
+
 
   $('.role').on('click', function () {
     resetDice();
     var attack_initial = parseInt($('.offense input').val());
     var defense_initial = parseInt($('.defense input').val());
-
-    var attack_remaining = attack_initial;
-    var defense_remaining = defense_initial
+    attack_remaining = attack_initial;
+    defense_remaining = defense_initial
 
     // while(attack_remaining > 1 && defense_remaining > 0) {
     // }
-    rollAllDice(attack_remaining, defense_remaining);
-    attackDice = [aDice1, aDice2, aDice3];
-    defenseDice = [dDice1, dDice2];
-    sortDice();
-    debugger;
-    setDebugInfo();
+    while(attack_remaining > 0 && defense_remaining > 0) {
+      rollAllDice(attack_remaining, defense_remaining);
+      attackDice = [aDice1, aDice2, aDice3];
+      defenseDice = [dDice1, dDice2];
+      sortDice();
+      compareDice();
+      setDebugInfo();
+    }
   });
 
 
